@@ -29,6 +29,8 @@ Route::prefix('user')->group(function () {
     Route::get('/{id}', [UserController::class, 'show']);
     Route::put('/{id}', [UserController::class, 'update']);
     Route::delete('/{id}', [UserController::class, 'destroy']);
+    Route::get('/user-details', [AuthController::class, 'getUserDetails']);
+
 });
 
 Route::prefix('animals')->group(function () {
