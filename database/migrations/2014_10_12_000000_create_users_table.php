@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('password');
             $table->string('document')->unique();
             $table->string('zip_code');
+            $table->string('phone');
             $table->enum('user_level', ['A','P','C']);
             $table->rememberToken();
             $table->timestamps();

@@ -50,6 +50,7 @@ class AuthController extends Controller
             'password' => 'required|string|min:6',
             'document' => 'required|string|min:11|unique:users',
             'zip_code' => 'required|string',
+            'phone' => 'required|string',
             'user_level' => 'required|string'
         ]);
 
@@ -60,6 +61,7 @@ class AuthController extends Controller
                 'password' => Hash::make($request->password),
                 'document' => $request->document,
                 'zip_code' => $request->zip_code,
+                'phone' => $request->phone,
                 'user_level' => $request->user_level,
             ]);
 
@@ -104,7 +106,7 @@ class AuthController extends Controller
             ]
         ]);
     }
-    
+
     public function getUserDetails()
     {
         // Obtenha o usuário autenticado
