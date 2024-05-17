@@ -5,9 +5,9 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Storage;
 use App\Models\Animal;
 use Aws\S3\S3Client;
+use Aws\Exception\AwsException;
 
 class AnimalController extends Controller
 {
@@ -113,33 +113,37 @@ class AnimalController extends Controller
                 'secret' => env('MINIO_SECRET_KEY'),
             ],
         ]);
-
+    
         $bucketName = env('MINIO_BUCKET');
         $prefix = "user/{$userId}/animal/{$animalId}/";
-
-        // Listar os objetos no bucket com o prefixo específico
-        $objects = $s3->listObjectsV2([
-            'Bucket' => $bucketName,
-            'Prefix' => $prefix
-        ]);
-
-        // Array para armazenar as URLs das imagens
-        $imageUrls = [];
-
-        // Loop através dos objetos retornados
-        foreach ($objects['Contents'] as $object) {
-            // Construir a URL da imagem
-            $imageUrl = "{$minioBaseUrl}/{$object['Key']}";
-            // Adicionar a URL ao array de URLs de imagens
-            $imageUrls[] = $imageUrl;
+    
+        try {
+            $objects = $s3->listObjectsV2([
+                'Bucket' => $bucketName,
+                'Prefix' => $prefix
+            ]);
+    
+            error_log(print_r($objects, true)); // Log da resposta do S3
+    
+            $imageUrls = [];
+    
+            if (isset($objects['Contents']) && is_array($objects['Contents'])) {
+                foreach ($objects['Contents'] as $object) {
+                    $imageUrl = "{$minioBaseUrl}/{$bucketName}/{$object['Key']}";
+                    $imageUrls[] = $imageUrl;
+                }
+            }
+    
+            return $imageUrls;
+    
+        } catch (AwsException $e) {
+            error_log("Error fetching objects from MinIO: " . $e->getMessage());
+            return [];
         }
-
-        // Retornar as URLs das imagens
-        return $imageUrls;
     }
-
-
-
+    
+    
+    
 
     public function store(Request $request)
     {
