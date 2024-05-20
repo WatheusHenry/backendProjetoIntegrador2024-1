@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -11,7 +10,6 @@ class Animal extends Model
 
     protected $table = 'animais'; // Defina o nome da tabela aqui
 
-
     protected $fillable = [
         'animal_name',
         'age',
@@ -21,7 +19,6 @@ class Animal extends Model
         'weight',
         'temperament',
         'owner_id',
-        'image_url',
         'status_id',
         'species_id',
     ];
@@ -30,4 +27,7 @@ class Animal extends Model
     {
         return $this->belongsTo(User::class, 'owner_id');
     }
+
+    // Garantir que timestamps estão habilitados
+    public $timestamps = true;
 }

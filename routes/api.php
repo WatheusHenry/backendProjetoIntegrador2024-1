@@ -37,6 +37,8 @@ Route::prefix('animals')->group(function () {
     Route::post('/', [AnimalController::class, 'store']);
     Route::get('/', [AnimalController::class, 'index']);
     Route::get('/{id}', [AnimalController::class, 'find']);
+    // Route::get('/all-animals', [AnimalController::class, 'allAnimalsWithImages']);
+
 });
 
 // Route::prefix('search-endereco')->group(function () {
@@ -46,5 +48,6 @@ Route::post('/search-endereco', [SearchEnderecoController::class, 'search']);
 
 Route::get('/search-endereco', [SearchEnderecoController::class, 'search']);
 
+Route::get('/all-animals', [AnimalController::class, 'allAnimalsWithImages']);
 
 Route::get('owners/{ownerId}/animals', [AnimalController::class, 'animalsByOwner']);

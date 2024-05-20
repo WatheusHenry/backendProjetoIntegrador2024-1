@@ -69,6 +69,40 @@ class AnimalController extends Controller
         ]);
     }
 
+    public function allAnimalsWithImages()
+    {
+        // Obter todos os animais cadastrados e ordenar por data de criação (mais novos primeiro)
+        $animals = Animal::orderBy('created_at', 'desc')->get();
+    
+        // URL base do seu servidor MinIO local
+        $minioBaseUrl = env('MINIO_ENDPOINT');
+    
+        // Array para armazenar os dados dos animais com URLs das imagens
+        $animalsWithImages = [];
+    
+        // Percorrer cada animal
+        foreach ($animals as $animal) {
+            // Obter o ID do usuário dono do animal
+            $userId = $animal->owner_id;
+            // Obter o ID do animal
+            $animalId = $animal->id;
+    
+            // Obter as URLs das imagens do animal
+            $imageUrls = $this->getImagesFromBucket($userId, $animalId, $minioBaseUrl);
+    
+            // Adicionar os dados do animal juntamente com as URLs das imagens ao array final
+            $animalsWithImages[] = [
+                'animal' => $animal,
+                'image_urls' => $imageUrls,
+            ];
+        }
+    
+        // Retornar os dados dos animais com URLs das imagens
+        return response()->json($animalsWithImages);
+    }
+    
+    
+
     public function animalsByOwner($ownerId)
     {
         // Obter todos os animais do proprietário específico
@@ -123,8 +157,6 @@ class AnimalController extends Controller
                 'Prefix' => $prefix
             ]);
     
-            error_log(print_r($objects, true)); // Log da resposta do S3
-    
             $imageUrls = [];
     
             if (isset($objects['Contents']) && is_array($objects['Contents'])) {
@@ -135,15 +167,14 @@ class AnimalController extends Controller
             }
     
             return $imageUrls;
-    
         } catch (AwsException $e) {
             error_log("Error fetching objects from MinIO: " . $e->getMessage());
             return [];
         }
     }
-    
-    
-    
+
+
+
 
     public function store(Request $request)
     {
